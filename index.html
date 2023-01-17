@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MusicVAE Create Sample</title>
+
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Load @magenta/music -->
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.0.0"></script>
+
+    <!-- Place your code in the script tag below. You can also use an external .js file -->
+    <script>
+      // Instantiate the model by loading the desired checkpoint.
+      const model = new mm.MusicVAE(
+        "https://storage.googleapis.com/download.magenta.tensorflow.org/" +
+          "tfjs_checkpoints/music_vae/trio_4bar_lokl_small_q1"
+      );
+      const player = new mm.Player();
+
+      const start = () => {
+        document.getElementById("start").style.display = "none";
+        // Resume AudioContext on user action to enable audio.
+        mm.Player.tone.context.resume();
+        model.initialize().then(
+          // Endlessly sample and play back the result.
+          function sampleAndPlay() {
+            return model
+              .sample(1)
+              .then((samples) => player.start(samples[0]))
+              .then(sampleAndPlay);
+          }
+        );
+      };
+    </script>
+  </head>
+  <body>
+    <div class="center">
+      <button class="button" id="start" onclick="start()">Start</button>
+    </div>
+  </body>
+</html>
